@@ -8,3 +8,5 @@ export function hello(who: string = world): string {
   console.log(food);
   return `Hello ${who}! `;
 }
+
+hello();
