@@ -22,3 +22,7 @@ jobs:
           yarn install
           yarn sls dynamodb install
           yarn sls dynamodb start
+        env:
+          APP_ENV: dev
+          IS_LOCAL: 1
+          DYNAMODB_PORT: 8000

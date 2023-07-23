@@ -26,6 +26,7 @@ custom:
   dynamodb:
     stages:
       - dev
+      - test
     start:
       host: 127.0.0.1
       port: ${env:DYNAMODB_PORT, 8000}
