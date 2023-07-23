@@ -21,6 +21,7 @@ jobs:
       - run: |
           yarn install
           docker compose -f .dynamodb-local-docker/docker-compose.yml up -d
+          yarn sls dynamodb migrate
           docker compose -f .dynamodb-local-docker/docker-compose.yml down
         env:
           APP_ENV: dev
