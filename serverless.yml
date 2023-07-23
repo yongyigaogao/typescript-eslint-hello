@@ -1,0 +1,67 @@
+service: hello
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  architecture: arm64
+  region: ap-northeast-1
+  deploymentBucket:
+    name: hello
+  timeout: 10
+  stage: ${env:APP_ENV, "unknown"}
+  endpointType: REGIONAL
+
+plugins:
+  - serverless-esbuild
+  - serverless-prune-plugin
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  prune:
+    automatic: true
+    number: 5
+  infraEnv: ${env:INFRA_ENV, 'dev'}
+  dynamodb:
+    stages:
+      - dev
+    start:
+      host: 127.0.0.1
+      port: ${env:DYNAMODB_PORT, 8000}
+      inMemory: true
+      migrate: true
+      convertEmptyValues: true
+
+functions:
+
+resources:
+  Resources:
+    CartItemTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: backend_stock_sale_${env:APP_ENV}_CartItem
+        AttributeDefinitions:
+          - AttributeName: pharmacyId
+            AttributeType: 'N'
+          - AttributeName: cartItemId
+            AttributeType: S
+          - AttributeName: medicineId
+            AttributeType: 'N'
+        KeySchema:
+          - AttributeName: pharmacyId
+            KeyType: HASH
+          - AttributeName: cartItemId
+            KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: medicineId-index
+            KeySchema:
+              - AttributeName: pharmacyId
+                KeyType: HASH
+              - AttributeName: medicineId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
